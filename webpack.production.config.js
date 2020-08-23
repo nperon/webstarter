@@ -4,15 +4,23 @@ const { CleanWebpackPlugin } = require('clean-webpack-plugin');
 const HtmlWebpackPlugin = require('html-webpack-plugin');
 
 module.exports = {
-    entry: './src/index.js',
+    entry: {
+        'hello-world': './src/hello-world.js',
+        'kiwi': './src/kiwi.js'
+    },
     output: {
-        filename: 'bundle.[contenthash].js',
+        filename: '[name].[contenthash].js',
         path: path.resolve(__dirname, './dist'),
         publicPath: ''
-        // publicPath: 'dist/'
-        // publicPath: 'http://www.example.com/'
     },
     mode: 'production',
+    optimization: {
+        splitChunks: {
+            chunks: "all",
+            minSize: 10000,
+            automaticNameDelimiter: '_'
+        }
+    },
     module: {
         rules: [
             {
@@ -54,7 +62,7 @@ module.exports = {
     },
     plugins: [
         new MiniCssExtractPlugin({
-            filename: 'styles.[contenthash].css'
+            filename: '[name].[contenthash].css'
         }),
         new CleanWebpackPlugin({
             cleanOnceBeforeBuildPatterns: [
@@ -67,9 +75,18 @@ module.exports = {
         //     meta: { description: 'Some description'}
         // })
         new HtmlWebpackPlugin({
+            filename: 'hello-world.html',
+            chunks: ['hello-world', 'vendors~hello-world~kiwi'],
             title: 'Hello World',
-            template: 'src/index.hbs',
-            description: 'Some description'
+            template: 'src/page-template.hbs',
+            description: 'Hello world'
+        }),
+        new HtmlWebpackPlugin({
+            filename: 'kiwi.html',
+            chunks: ['kiwi', 'vendors~hello-world~kiwi'],
+            title: 'Kiwi',
+            template: 'src/page-template.hbs',
+            description: 'Kiwi'
         })
     ]
 }
